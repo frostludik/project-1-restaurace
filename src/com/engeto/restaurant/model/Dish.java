@@ -1,5 +1,8 @@
 package com.engeto.restaurant.model;
 
+import com.engeto.restaurant.util.RestaurantException;
+import com.engeto.restaurant.util.ValidationUtils;
+
 import java.math.BigDecimal;
 
 public class Dish {
@@ -8,18 +11,20 @@ public class Dish {
     private BigDecimal price;
     private int preparationTime;
     private String dishImage;
+    private static final String defaultImage = "blank";
 
 
-    public Dish(String title, BigDecimal price, int preparationTime, String dishImage) {
+    public Dish(String title, BigDecimal price, int preparationTime, String dishImage) throws RestaurantException {
         this.title = title;
         this.price = price;
+        ValidationUtils.validatePreparationTime(preparationTime);
         this.preparationTime = preparationTime;
-        this.dishImage = dishImage;
+        this.setDishImage(dishImage);
     }
 
 
-    public Dish(String title, BigDecimal price, int preparationTime) {
-        this(title, price, preparationTime, "blank");
+    public Dish(String title, BigDecimal price, int preparationTime) throws RestaurantException {
+        this(title, price, preparationTime, defaultImage);
     }
 
     public long getId() {
@@ -50,7 +55,8 @@ public class Dish {
         return preparationTime;
     }
 
-    public void setPreparationTime(int preparationTime) {
+    public void setPreparationTime(int preparationTime) throws RestaurantException {
+        ValidationUtils.validatePreparationTime(preparationTime);
         this.preparationTime = preparationTime;
     }
 
@@ -59,7 +65,9 @@ public class Dish {
     }
 
     public void setDishImage(String dishImage) {
-        this.dishImage = dishImage;
+        this.dishImage = ValidationUtils.validateDishImage(dishImage, Dish.defaultImage);
     }
+
+
 }
 
