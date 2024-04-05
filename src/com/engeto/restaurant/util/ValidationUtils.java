@@ -8,4 +8,9 @@ public class ValidationUtils {
             throw new RestaurantException("Preparation time must be greater than 0. You entered: " + preparationTime);
         }
     }
+
+    public static String validateDishImage(String dishImage, String defaultImage) {
+        return (dishImage == null || dishImage.isEmpty()) ? defaultImage : dishImage;
+    }
+
 }
