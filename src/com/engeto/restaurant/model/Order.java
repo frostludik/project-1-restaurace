@@ -1,29 +1,35 @@
 package com.engeto.restaurant.model;
 
+import com.engeto.restaurant.util.RestaurantException;
+
 import java.time.LocalDateTime;
 
 public class Order {
 
     private long id;
+    private static long currentId = 1;
+    private Dish dish;
+    private int quantity;
     private Table table;
     private LocalDateTime orderTime;
     private LocalDateTime servedTime;
-    private Dish dish;
-    private int quantity;
     private boolean isServed;
     private boolean isPaid;
 
-    public Order(long id, Table table, LocalDateTime orderTime, LocalDateTime servedTime, Dish dish, int quantity, boolean isServed, boolean isPaid) {
-        this.id = id;
+    public Order(Dish dish, int quantity, Table table, LocalDateTime orderTime, LocalDateTime servedTime, boolean isServed, boolean isPaid) throws RestaurantException {
+        this.id = currentId++;
+        this.dish = dish;
+        setQuantity(quantity);
         this.table = table;
         this.orderTime = orderTime;
         this.servedTime = servedTime;
-        this.dish = dish;
-        this.quantity = quantity;
         this.isServed = isServed;
         this.isPaid = isPaid;
     }
 
+    public Order(Dish dish, int quantity, Table table) throws RestaurantException {
+        this(dish, quantity, table, LocalDateTime.now(), null, false, false);
+    }
     public long getId() {
         return id;
     }
@@ -68,7 +74,10 @@ public class Order {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(int quantity) throws RestaurantException {
+        if (quantity <= 0) {
+            throw new RestaurantException("Quantity must be greater than 0. You entered: " + quantity);
+        }
         this.quantity = quantity;
     }
 
