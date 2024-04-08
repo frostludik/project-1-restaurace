@@ -1,19 +1,16 @@
 package com.engeto.restaurant.manager;
 
+import com.engeto.restaurant.model.Dish;
 import com.engeto.restaurant.model.Order;
 import com.engeto.restaurant.model.Table;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 public class RestaurantManager {
 
     private static List<Order> ordersList = new ArrayList<>();
     private static List<Table> tablesList = new ArrayList<>();
-
-
 
 
     public static List<Order> getOrdersList() {
@@ -66,6 +63,17 @@ public class RestaurantManager {
             return 0;
         }
         return (double) totalSeconds / ordersServed;
+    }
+
+    //list of meals ordered today (show just unique meals, do not repeat the meal if it was ordered multiple times)
+    public List<String> getUniqueMealsOrderedToday() {
+        Set<String> uniqueMealsSet = new HashSet<>();
+        for (Order order : ordersList) {
+            if (order.getOrderTime().toLocalDate().equals(java.time.LocalDate.now())) {
+                uniqueMealsSet.add(order.getDish().getTitle());
+            }
+        }
+        return new ArrayList<>(uniqueMealsSet);
     }
 
 }
