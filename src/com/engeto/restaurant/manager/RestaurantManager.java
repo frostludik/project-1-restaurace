@@ -6,10 +6,7 @@ import com.engeto.restaurant.model.Table;
 import com.engeto.restaurant.util.RestaurantException;
 import com.engeto.restaurant.util.Settings;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.time.Duration;
 import java.util.*;
 
@@ -17,6 +14,7 @@ public class RestaurantManager {
 
     private static List<Order> ordersList = new ArrayList<>();
     private static List<Table> tablesList = new ArrayList<>();
+    Order order = new Order();
 
     public static List<Order> getOrdersList() {
         return ordersList;
@@ -115,5 +113,15 @@ public class RestaurantManager {
         }
     }
 
+    public void importFromFile() throws RestaurantException {
+        String fileName = Settings.getOrdersFile();
+        try (Scanner scanner = new Scanner(new BufferedReader(new FileReader(fileName)))) {
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                ordersList.add(order.parseOrder(line));}
+        } catch (FileNotFoundException e) {
+            throw new RestaurantException("File " + fileName + " not found!");
+        }
+    }
 
 }
