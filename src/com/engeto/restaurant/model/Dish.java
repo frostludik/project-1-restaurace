@@ -14,6 +14,7 @@ public class Dish {
     private static final String defaultImage = "blank";
 
 
+
     public Dish(String title, BigDecimal price, int preparationTime, String dishImage) throws RestaurantException {
         this.title = title;
         this.price = price;
@@ -24,7 +25,7 @@ public class Dish {
 
 
     public Dish(String title, BigDecimal price, int preparationTime) throws RestaurantException {
-        this(title, price, preparationTime, defaultImage);
+        this(title, price, preparationTime, defaultImage;
     }
 
     public long getId() {
@@ -66,6 +67,27 @@ public class Dish {
 
     public void setDishImage(String dishImage) {
         this.dishImage = ValidationUtils.validateDishImage(dishImage, Dish.defaultImage);
+    }
+    public static Dish parseDish(String data) throws RestaurantException {
+        String [] items;
+        try {
+            items = data.split("\t");
+            String title = items[0];
+            BigDecimal price = new BigDecimal(items[1]);
+            int preparationTime = Integer.parseInt(items[2]);
+            String imageMain = items[3];
+            return new Dish(title, price, preparationTime, defaultImage );
+        } catch (IllegalArgumentException e) {
+            throw new RestaurantException("Wrong data. Unable to parse dish from file!");
+        }
+    }
+    public String exportToString() {
+        return title + "\t" + price + "\t" + preparationTime + "\t" + defaultImage;
+    }
+
+    @Override
+    public String toString() {
+        return title;
     }
 
 
