@@ -1,6 +1,6 @@
 package com.engeto.restaurant.util;
 
-public class settings {
+public class Settings {
     private static final String COOKBOOK_FILE = "resources/cookbook.txt";
     private static final String ORDERS_FILE = "resources/orders.txt";
 
