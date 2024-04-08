@@ -25,7 +25,7 @@ public class Dish {
 
 
     public Dish(String title, BigDecimal price, int preparationTime) throws RestaurantException {
-        this(title, price, preparationTime, defaultImage;
+        this(title, price, preparationTime, defaultImage);
     }
 
     public long getId() {
