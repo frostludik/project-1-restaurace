@@ -3,6 +3,7 @@ package com.engeto.restaurant.model;
 import com.engeto.restaurant.util.RestaurantException;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Order {
 
@@ -96,4 +97,24 @@ public class Order {
     public void setPaid(boolean paid) {
         isPaid = paid;
     }
+
+    public String exportOrderToString() {
+        return table + "\t" + orderTime + "\t" + servedTime + "\t" + dish + "\t" + quantity + "\t" + isServed + "\t" + isPaid;
+    }
+
+    public String getOrderTimeFormatted() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        return orderTime.format(formatter);
+    }
+    public String getServedTimeFormatted() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        return servedTime.format(formatter);
+    }
+    public String getOrderFormattedForPrint() {
+
+        String paidText = isPaid ? "zaplaceno" : "";
+        return "." + " " + dish + " " + quantity + "x (" + dish.getPrice() + " Kč) " + ":" + "\t"
+                + getOrderTimeFormatted() + "-" + getServedTimeFormatted() + "\t" + paidText;
+    }
+
 }
