@@ -1,7 +1,7 @@
 package com.engeto.restaurant.model;
 
+import com.engeto.restaurant.manager.RestaurantManager;
 import com.engeto.restaurant.util.RestaurantException;
-import com.engeto.restaurant.util.Settings;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -19,6 +19,7 @@ public class Order {
     private boolean isServed;
     private boolean isPaid;
     private DishList dishList = new DishList();
+    private RestaurantManager restaurantManager = new RestaurantManager();
 
     public Order() {
     }
@@ -34,6 +35,7 @@ public class Order {
         this.isServed = isServed;
         this.isPaid = isPaid;
         this.dishList = dishList;
+        this.restaurantManager = new RestaurantManager();
     }
 
     public Order(Dish dish, int quantity, Table table) throws RestaurantException {
@@ -133,7 +135,7 @@ public class Order {
 
     public List<Dish> getListOfMenuDishes() {
         try {
-            dishList.importFromFile();
+            List<Dish> dishes = RestaurantManager.importDishesFromFile();
         } catch (RestaurantException e) {
             System.err.println(e.getLocalizedMessage());
         }
