@@ -3,7 +3,13 @@ package com.engeto.restaurant.manager;
 import com.engeto.restaurant.model.Dish;
 import com.engeto.restaurant.model.Order;
 import com.engeto.restaurant.model.Table;
+import com.engeto.restaurant.util.RestaurantException;
+import com.engeto.restaurant.util.Settings;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.time.Duration;
 import java.util.*;
 
@@ -11,7 +17,6 @@ public class RestaurantManager {
 
     private static List<Order> ordersList = new ArrayList<>();
     private static List<Table> tablesList = new ArrayList<>();
-
 
     public static List<Order> getOrdersList() {
         return ordersList;
@@ -29,7 +34,7 @@ public class RestaurantManager {
         tablesList.add(table);
     }
 
-    //how many orders are in progress and not served yet
+
     public static int getOrdersInProgress() {
         int ordersInProgress = 0;
         for (Order order : ordersList) {
@@ -40,14 +45,13 @@ public class RestaurantManager {
         return ordersInProgress;
     }
 
-    //sort orders by order time
     public static List<Order> sortOrdersByOrderTime() {
         List<Order> sortedOrders = new ArrayList<>(ordersList);
         sortedOrders.sort(Comparator.comparing(Order::getOrderTime));
         return sortedOrders;
     }
 
-    //average time to fulfill an order
+
     public double getAverageTimeToServe() {
         long totalSeconds = 0;
         int ordersServed = 0;
@@ -65,7 +69,7 @@ public class RestaurantManager {
         return (double) totalSeconds / ordersServed;
     }
 
-    //list of meals ordered today (show just unique meals, do not repeat the meal if it was ordered multiple times)
+
     public List<String> getUniqueMealsOrderedToday() {
         Set<String> uniqueMealsSet = new HashSet<>();
         for (Order order : ordersList) {
@@ -75,5 +79,41 @@ public class RestaurantManager {
         }
         return new ArrayList<>(uniqueMealsSet);
     }
+
+    private String getOrderHeaderForTableOutput(int tableNumber) {
+        String header = "** Objednávky pro stůl č. " + tableNumber;
+        if (tableNumber < 9) {
+            header = "** Objednávky pro stůl č. " + " " + tableNumber;
+        }
+        return header;
+    }
+
+
+    public List<Order> getOrdersForTableOutput(int tableNumber) {
+        int orderNumber = 1;
+        List<Order> ordersForTable = new ArrayList<>();
+        System.out.println(getOrderHeaderForTableOutput(tableNumber));
+        System.out.println("****");
+
+        for (Order order : ordersList) {
+            if (order.getTable().getTableNumber() == tableNumber) {
+                System.out.println(orderNumber + order.getOrderFormattedForPrint());
+                orderNumber += 1;
+            }
+        }
+        System.out.println("******");
+        return ordersForTable;
+    }
+    public void exportToFile() throws RestaurantException {
+        String fileName = Settings.getOrdersFile();
+        try (PrintWriter outputWriter = new PrintWriter(new BufferedWriter(new FileWriter(fileName)))) {
+            for (Order order : ordersList) {
+                outputWriter.println(order.exportOrderToString());
+            }
+        } catch (IOException e) {
+            throw new RestaurantException("Saving data to a file: " + fileName + " failed!");
+        }
+    }
+
 
 }
