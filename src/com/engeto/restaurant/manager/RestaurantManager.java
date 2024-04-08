@@ -14,7 +14,8 @@ public class RestaurantManager {
 
     private static List<Order> ordersList = new ArrayList<>();
     private static List<Table> tablesList = new ArrayList<>();
-    Order order = new Order();
+    private static Order order = new Order();
+    private static List<Dish> dishes = new ArrayList<>();
 
     public static List<Order> getOrdersList() {
         return ordersList;
@@ -102,7 +103,7 @@ public class RestaurantManager {
         System.out.println("******");
         return ordersForTable;
     }
-    public void exportToFile() throws RestaurantException {
+    private static void exportOrdersToFile() throws RestaurantException {
         String fileName = Settings.getOrdersFile();
         try (PrintWriter outputWriter = new PrintWriter(new BufferedWriter(new FileWriter(fileName)))) {
             for (Order order : ordersList) {
@@ -113,15 +114,54 @@ public class RestaurantManager {
         }
     }
 
-    public void importFromFile() throws RestaurantException {
-        String fileName = Settings.getOrdersFile();
-        try (Scanner scanner = new Scanner(new BufferedReader(new FileReader(fileName)))) {
+    private static void exportDishesToFile() throws RestaurantException {
+        String fileName = Settings.getCookbookFile();
+        try (PrintWriter outputWriter = new PrintWriter(new BufferedWriter(new FileWriter(fileName)))) {
+            for (Dish dish : dishes) {
+                outputWriter.println(dish.exportToString());
+            }
+        } catch (IOException e) {
+            throw new RestaurantException("Saving data to file: " + fileName + " failed!");
+        }
+    }
+    private static void importOrdersFromFile() throws RestaurantException {
+        String orderFileName = Settings.getOrdersFile();
+        try (Scanner scanner = new Scanner(new BufferedReader(new FileReader(orderFileName)))) {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 ordersList.add(order.parseOrder(line));}
         } catch (FileNotFoundException e) {
-            throw new RestaurantException("File " + fileName + " not found!");
+            throw new RestaurantException("File " + orderFileName + " not found!");
         }
     }
 
+    private static void importDishesFromFile() throws RestaurantException {
+        String dishesFileName = Settings.getCookbookFile();
+        try (Scanner scanner = new Scanner(new BufferedReader(new FileReader(dishesFileName)))) {
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                dishes.add(Dish.parseDish(line)); }
+        } catch (FileNotFoundException e) {
+            throw new RestaurantException("File" + dishesFileName + " not found!");
+        }
+    }
+
+    public static void importDataFromFile() {
+        try {
+            importOrdersFromFile();
+            importDishesFromFile();
+        } catch (Exception e) {
+            System.err.println("Error reading from the file: " + e.getMessage());
+        }
+    }
+
+
+    public static void exportDataToFile(String dishFileName, String orderFileName) {
+        try {
+            exportOrdersToFile();
+            exportDishesToFile();
+        } catch (Exception e) {
+            System.err.println("Error saving data to file file: " + e.getMessage());
+        }
+    }
 }
