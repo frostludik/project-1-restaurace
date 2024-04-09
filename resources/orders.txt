@@ -1,0 +1,3 @@
+com.engeto.restaurant.model.Table@7ab2bfe1	2024-04-09T15:19:33.444470400	null	Kuřecí řízek obalovaný 150 g	2	false	false
+com.engeto.restaurant.model.Table@7ab2bfe1	2024-04-09T15:19:33.446470500	null	Hranolky 150 g	2	false	false
+com.engeto.restaurant.model.Table@7ab2bfe1	2024-04-09T15:19:33.446470500	2024-04-09T15:19:33.446470500	Kofola 0,5 l	2	false	false
