@@ -1,5 +1,7 @@
 package com.engeto.restaurant.util;
 
+import java.time.LocalDateTime;
+
 public class ValidationUtils {
 
 
@@ -13,4 +15,12 @@ public class ValidationUtils {
         return (dishImage == null || dishImage.isEmpty()) ? defaultImage : dishImage;
     }
 
+
+    public static void validateTime(LocalDateTime time, String fieldName) throws RestaurantException {
+        LocalDateTime currentDateTime = LocalDateTime.now();
+
+        if (time.isAfter(currentDateTime)) {
+            throw new RestaurantException(fieldName + " cannot be in future. Value set: " + time);
+        }
+    }
 }
