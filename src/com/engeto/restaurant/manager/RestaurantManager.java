@@ -7,6 +7,7 @@ import com.engeto.restaurant.util.RestaurantException;
 import com.engeto.restaurant.util.Settings;
 
 import java.io.*;
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.*;
 
@@ -51,7 +52,7 @@ public class RestaurantManager {
     }
 
 
-    public double getAverageTimeToServe() {
+    public static double getAverageTimeToServe() {
         long totalSeconds = 0;
         int ordersServed = 0;
 
@@ -69,7 +70,7 @@ public class RestaurantManager {
     }
 
 
-    public List<String> getUniqueMealsOrderedToday() {
+    public static List<String> getUniqueMealsOrderedToday() {
         Set<String> uniqueMealsSet = new HashSet<>();
         for (Order order : ordersList) {
             if (order.getOrderTime().toLocalDate().equals(java.time.LocalDate.now())) {
@@ -79,7 +80,7 @@ public class RestaurantManager {
         return new ArrayList<>(uniqueMealsSet);
     }
 
-    private String getOrderHeaderForTableOutput(int tableNumber) {
+    private static String getOrderHeaderForTableOutput(int tableNumber) {
         String header = "** Objednávky pro stůl č. " + tableNumber;
         if (tableNumber < 9) {
             header = "** Objednávky pro stůl č. " + " " + tableNumber;
@@ -88,7 +89,7 @@ public class RestaurantManager {
     }
 
 
-    public List<Order> getOrdersForTableOutput(int tableNumber) {
+    public static List<Order> getOrdersForTableOutput(int tableNumber) {
         int orderNumber = 1;
         List<Order> ordersForTable = new ArrayList<>();
         System.out.println(getOrderHeaderForTableOutput(tableNumber));
@@ -104,24 +105,24 @@ public class RestaurantManager {
         return ordersForTable;
     }
     private static void exportOrdersToFile() throws RestaurantException {
-        String fileName = Settings.getOrdersFile();
-        try (PrintWriter outputWriter = new PrintWriter(new BufferedWriter(new FileWriter(fileName)))) {
+        String orderFileName = Settings.getOrdersFile();
+        try (PrintWriter outputWriter = new PrintWriter(new BufferedWriter(new FileWriter(orderFileName)))) {
             for (Order order : ordersList) {
                 outputWriter.println(order.exportOrderToString());
             }
         } catch (IOException e) {
-            throw new RestaurantException("Saving data to a file: " + fileName + " failed!");
+            throw new RestaurantException("Saving data to a file: " + orderFileName + " failed!");
         }
     }
 
     private static void exportDishesToFile() throws RestaurantException {
-        String fileName = Settings.getCookbookFile();
-        try (PrintWriter outputWriter = new PrintWriter(new BufferedWriter(new FileWriter(fileName)))) {
+        String dishesFileName = Settings.getCookbookFile();
+        try (PrintWriter outputWriter = new PrintWriter(new BufferedWriter(new FileWriter(dishesFileName)))) {
             for (Dish dish : dishes) {
                 outputWriter.println(dish.exportToString());
             }
         } catch (IOException e) {
-            throw new RestaurantException("Saving data to file: " + fileName + " failed!");
+            throw new RestaurantException("Saving data to file: " + dishesFileName + " failed!");
         }
     }
     private static void importOrdersFromFile() throws RestaurantException {
@@ -135,7 +136,7 @@ public class RestaurantManager {
         }
     }
 
-    private static void importDishesFromFile() throws RestaurantException {
+    public static List<Dish> importDishesFromFile() throws RestaurantException {
         String dishesFileName = Settings.getCookbookFile();
         try (Scanner scanner = new Scanner(new BufferedReader(new FileReader(dishesFileName)))) {
             while (scanner.hasNextLine()) {
@@ -144,9 +145,10 @@ public class RestaurantManager {
         } catch (FileNotFoundException e) {
             throw new RestaurantException("File" + dishesFileName + " not found!");
         }
+        return null;
     }
 
-    public static void importDataFromFile() {
+    public static void importDataFromFile() throws RestaurantException {
         try {
             importOrdersFromFile();
             importDishesFromFile();
@@ -156,12 +158,23 @@ public class RestaurantManager {
     }
 
 
-    public static void exportDataToFile(String dishFileName, String orderFileName) {
+    public static void exportDataToFile() {
         try {
             exportOrdersToFile();
             exportDishesToFile();
         } catch (Exception e) {
             System.err.println("Error saving data to file file: " + e.getMessage());
         }
+    }
+
+    public static BigDecimal getTotalCostPerTable(int tableNumber) {
+        BigDecimal totalCost = BigDecimal.ZERO;
+
+        for (Order order : ordersList) {
+            if (order.getTable().getTableNumber() == tableNumber) {
+                totalCost = totalCost.add(order.getOrderedDish().getPrice().multiply(BigDecimal.valueOf(order.getQuantity())));
+            }
+        }
+        return totalCost;
     }
 }
