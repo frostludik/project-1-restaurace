@@ -1,34 +1,33 @@
 package com.engeto.restaurant.model;
 import com.engeto.restaurant.util.RestaurantException;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Collection;
-import java.util.Optional;
+import java.util.*;
 
 public class CookBook {
 
-    private static Map<String, Dish> dishMap = new HashMap<>();
-
-    public static void addDish(Dish dish) {
-        dishMap.put(dish.getTitle(), dish);
-    }
+    private static Map<String, Dish> dishMap = new LinkedHashMap<>();
 
     public static void addDishToCookBook(Dish dish) {
         dishMap.put(dish.getTitle(), dish);
     }
 
-    public void removeDishById(long id) throws RestaurantException {
-        if (!dishMap.containsKey(id)) {
-            throw new RestaurantException("Dish with ID " + id + " not found.");
+    public void removeDishById(long dishId) throws RestaurantException {
+        try {
+            Dish dishToRemove = getDishById(dishId);
+            dishMap.remove(dishToRemove.getTitle());
+            System.out.println("Pokrm č. " + dishId + " - " + dishToRemove.getTitle() + " byl úspěšně odstraněn.");
+        } catch (RestaurantException e) {
+            throw new RestaurantException("Chyba při pokusu o odstranění pokrmu: " + e.getMessage());
         }
-        dishMap.remove(id);
     }
-    public static Optional<Dish> getDishById(long id) {
-        return Optional.ofNullable(dishMap.get(id));
+    public static Dish getDishById(long dishId) throws RestaurantException {
+        for (Dish dish : dishMap.values()) {
+            if (dish.getId() == dishId) {
+                return dish;
+            }
+        }
+        throw new RestaurantException("Dish with ID " + dishId + " not found!");
     }
-
-
     public Collection<Dish> getAllDishes() {
         return dishMap.values();
     }
