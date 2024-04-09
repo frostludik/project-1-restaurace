@@ -14,10 +14,12 @@ import java.util.*;
 
 public class RestaurantManager {
 
-    private static List<Order> ordersList = new ArrayList<>();
-    private static List<Table> tablesList = new ArrayList<>();
-    private static Order order = new Order();
-    private static List<Dish> dishes = new ArrayList<>();
+    private static final List<Order> ordersList = new ArrayList<>();
+    private static final List<Table> tablesList = new ArrayList<>();
+    private static final Order order = new Order();
+    private static final List<Dish> dishes = new ArrayList<>();
+
+
 
     public static List<Order> getOrdersList() {
         return ordersList;
@@ -34,6 +36,7 @@ public class RestaurantManager {
     public static void addTable(Table table) {
         tablesList.add(table);
     }
+
 
 
     public static int getOrdersInProgress() {
@@ -53,15 +56,35 @@ public class RestaurantManager {
     }
 
 
+//    public static double getAverageTimeToServe() {
+//        long totalSeconds = 0;
+//        int ordersServed = 0;
+//
+//        for (Order order : ordersList) {
+//            if (order.isServed() && order.getServedTime() != null && order.getOrderTime() != null) {
+//                Duration duration = Duration.between(order.getOrderTime(), order.getServedTime());
+//                totalSeconds += duration.getSeconds();
+//                ordersServed++;
+//            }
+//        }
+//        if (ordersServed == 0) {
+//            return 0;
+//        }
+//        return (double) totalSeconds / ordersServed;
+//    }
+
     public static double getAverageTimeToServe() {
         long totalSeconds = 0;
         int ordersServed = 0;
 
         for (Order order : ordersList) {
-            if (order.isServed() && order.getServedTime() != null && order.getOrderTime() != null) {
-                Duration duration = Duration.between(order.getOrderTime(), order.getServedTime());
-                totalSeconds += duration.getSeconds();
-                ordersServed++;
+            if (order.isServed() && order.getOrderTime() != null) {
+                Optional<LocalDateTime> servedTimeOpt = order.getServedTime();
+                if (servedTimeOpt.isPresent()) {
+                    Duration duration = Duration.between(order.getOrderTime(), servedTimeOpt.get());
+                    totalSeconds += duration.getSeconds();
+                    ordersServed++;
+                }
             }
         }
         if (ordersServed == 0) {
@@ -69,6 +92,7 @@ public class RestaurantManager {
         }
         return (double) totalSeconds / ordersServed;
     }
+
 
 
     public static List<String> getUniqueMealsOrderedToday() {
@@ -97,7 +121,7 @@ public class RestaurantManager {
         System.out.println("****");
 
         for (Order order : ordersList) {
-            if (order.getTable().getTableNumber() == tableNumber) {
+            if (Table.getTableNumber() == tableNumber) {
                 System.out.println(orderNumber + order.getOrderFormattedForPrint());
                 orderNumber += 1;
             }
@@ -181,7 +205,7 @@ public class RestaurantManager {
 
     private static void createOrder(Dish dish, int quantity, int tableNumber, LocalDateTime orderedTime, LocalDateTime fulfilmentTime,
                                     boolean isPaid) throws RestaurantException {
-        Order order = new Order(Optional.ofNullable(dish), quantity, tableNumber);
+        Order order = new Order(dish, quantity, tableNumber);
         order.setOrderedTime(orderedTime);
         order.setServedTime(fulfilmentTime);
         order.setPaid(isPaid);
