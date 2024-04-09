@@ -6,6 +6,7 @@ import com.engeto.restaurant.util.ValidationUtils;
 import java.math.BigDecimal;
 
 public class Dish {
+    private static long lastAssignedId = 1;
     private long id;
     private String title;
     private BigDecimal price;
@@ -16,11 +17,13 @@ public class Dish {
 
 
     public Dish(String title, BigDecimal price, int preparationTime, String dishImage) throws RestaurantException {
+        this.id = lastAssignedId++;
         this.title = title;
         this.price = price;
         ValidationUtils.validatePreparationTime(preparationTime);
         this.preparationTime = preparationTime;
         this.setDishImage(dishImage);
+        CookBook.addDishToCookBook(this);
     }
 
 
@@ -28,6 +31,17 @@ public class Dish {
         this(title, price, preparationTime, defaultImage);
     }
 
+    private Dish(long id, String title, BigDecimal price, int preparationTimeInMinutes, String dishImage) throws RestaurantException {
+        this.id = id;
+        this.title = title;
+        setPrice(price);
+        setPreparationTime(preparationTimeInMinutes);
+        this.dishImage = dishImage;
+    }
+
+    public static Dish createDishWithId(long id, String title, BigDecimal price, int preparationTimeInMinutes, String image) throws RestaurantException {
+        return new Dish(id, title, price, preparationTimeInMinutes, image);
+    }
     public long getId() {
         return id;
     }
