@@ -3,15 +3,19 @@ package com.engeto.restaurant.model;
 import com.engeto.restaurant.manager.RestaurantManager;
 import com.engeto.restaurant.util.RestaurantException;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class Order {
 
     private long id;
     private static long currentId = 1;
     private Dish dish;
+    private Dish orderedDish;
     private int quantity;
     private Table table;
     private LocalDateTime orderTime;
@@ -43,6 +47,12 @@ public class Order {
     }
 
     public Order(int table, LocalDateTime orderTime, LocalDateTime servedTime, Dish dish, int quantity, boolean isServed, boolean isPaid) {
+    }
+
+    public Order(Optional<Dish> rizek, int quantity, int i) {
+    }
+
+    public Order(Optional<Dish> pstruh, int i, int i1, LocalDateTime of, LocalDateTime of1, boolean b) {
     }
 
     public long getId() {
@@ -85,6 +95,10 @@ public class Order {
     public void setDish(Dish dish) {
         this.dish = dish;
     }
+    public Dish getOrderedDish() {
+        return orderedDish;
+    }
+
 
     public int getQuantity() {
         return quantity;
@@ -151,8 +165,9 @@ public class Order {
         return null;
     }
 
-    public Order parseOrder(String data) throws RestaurantException {
-        String [] items;
+
+
+    public Order parseOrder(String data) throws RestaurantException {String [] items;
         try {
             items = data.split("\t");
             int table = Integer.parseInt(items[0]);
@@ -167,5 +182,9 @@ public class Order {
         catch (IllegalArgumentException e) {
             throw new RestaurantException("Unable to read data from file!");
         }
+    }
+
+    public void fulfilOrder() {
+        servedTime = LocalDateTime.now();
     }
 }
