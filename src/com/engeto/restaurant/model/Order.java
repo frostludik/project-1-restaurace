@@ -3,57 +3,45 @@ package com.engeto.restaurant.model;
 import com.engeto.restaurant.manager.RestaurantManager;
 import com.engeto.restaurant.util.RestaurantException;
 import com.engeto.restaurant.util.ValidationUtils;
-
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 
 public class Order {
 
     private long id;
     private static long currentId = 1;
     private Dish dish;
-    private Dish orderedDish;
     private int quantity;
     private Table table;
     private LocalDateTime orderTime;
     private LocalDateTime servedTime;
     private boolean isServed;
     private boolean isPaid;
-    private DishList dishList = new DishList();
-    private RestaurantManager restaurantManager = new RestaurantManager();
 
     public Order() {
     }
 
 
-    public Order(Dish dish, int quantity, Table table, LocalDateTime orderTime, LocalDateTime servedTime, boolean isServed, boolean isPaid, DishList dishList) throws RestaurantException {
+    public Order(Dish dish, int quantity, int tableNumber, LocalDateTime orderTime, LocalDateTime servedTime, boolean isPaid) throws RestaurantException {
         this.id = currentId++;
         this.dish = dish;
         setQuantity(quantity);
-        this.table = table;
+        this.table = Table.getTableByNumber(tableNumber, RestaurantManager.getTablesList());
         this.orderTime = orderTime;
         this.servedTime = servedTime;
-        this.isServed = isServed;
         this.isPaid = isPaid;
-        this.dishList = dishList;
-        this.restaurantManager = new RestaurantManager();
+        RestaurantManager.addOrderToOrderList(this);
     }
 
-    public Order(Dish dish, int quantity, Table table) throws RestaurantException {
-        this(dish, quantity, table, LocalDateTime.now(), null, false, false, new DishList());
+    public Order(Dish dish, int quantity, int tableNumber) throws RestaurantException {
+        this(dish, quantity, tableNumber, LocalDateTime.now(), null,false);
     }
 
-    public Order(int table, LocalDateTime orderTime, LocalDateTime servedTime, Dish dish, int quantity, boolean isServed, boolean isPaid) {
-    }
-
-    public Order(Optional<Dish> rizek, int quantity, int i) {
-    }
-
-    public Order(Optional<Dish> pstruh, int i, int i1, LocalDateTime of, LocalDateTime of1, boolean b) {
+    public Order(int tableNumber, LocalDateTime orderTime, LocalDateTime servedTime, Dish dish, int quantity, boolean isServed, boolean isPaid) throws RestaurantException {
+        this(dish, quantity, tableNumber, LocalDateTime.now(), null, false);
     }
 
     public long getId() {
@@ -78,11 +66,12 @@ public class Order {
     }
 
 
-    public LocalDateTime getServedTime() {
-        return servedTime;
+//    public LocalDateTime getServedTime() {
+//        return this.servedTime;
+//    }
+    public Optional<LocalDateTime> getServedTime() {
+        return Optional.ofNullable(this.servedTime);
     }
-
-
     public Dish getDish() {
         return dish;
     }
@@ -91,9 +80,8 @@ public class Order {
         this.dish = dish;
     }
     public Dish getOrderedDish() {
-        return orderedDish;
+        return dish;
     }
-
 
     public int getQuantity() {
         return quantity;
@@ -135,7 +123,9 @@ public class Order {
             }
         }
         this.servedTime = servedTime;
+        this.isServed = true;
     }
+
 
     public String exportOrderToString() {
         return table + "\t" + orderTime + "\t" + servedTime + "\t" + dish + "\t" + quantity + "\t" + isServed + "\t" + isPaid;
@@ -145,10 +135,19 @@ public class Order {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
         return orderTime.format(formatter);
     }
+//    public String getServedTimeFormatted() {
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+//        return getServedTime().format(formatter);
+//    }
     public String getServedTimeFormatted() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-        return servedTime.format(formatter);
-    }
+        return getServedTime()
+                .map(servedTime -> servedTime.format(formatter))
+                .orElse("Not served");
+}
+
+
+
     public String getOrderFormattedForPrint() {
 
         String paidText = isPaid ? "zaplaceno" : "";
@@ -156,34 +155,13 @@ public class Order {
                 + getOrderTimeFormatted() + "-" + getServedTimeFormatted() + "\t" + paidText;
     }
 
-
-    public List<Dish> getListOfMenuDishes() {
-        try {
-            List<Dish> dishes = RestaurantManager.importDishesFromFile();
-        } catch (RestaurantException e) {
-            System.err.println(e.getLocalizedMessage());
-        }
-        return dishList.getDishes();
-    }
-    List<Dish> dishes = getListOfMenuDishes();
-    public Dish getDishObjectFromStringTitle(String dishTitle) {
-        for (Dish dish : dishes) {
-            if (dishTitle.equals(dish.getTitle())) {
-                return dish;
-            }
-        }
-        return null;
-    }
-
-
-
     public Order parseOrder(String data) throws RestaurantException {String [] items;
         try {
             items = data.split("\t");
             int table = Integer.parseInt(items[0]);
             LocalDateTime orderTime = LocalDateTime.parse(items[1]);
             LocalDateTime servedTime = LocalDateTime.parse(items[2]);
-            Dish orderedDish = getDishObjectFromStringTitle(items[3]);
+            Dish dish = Dish.parseDish(items[3]);
             int quantity = Integer.parseInt(items[4]);
             boolean isServed = Boolean.parseBoolean(items[5]);
             boolean isPaid = Boolean.parseBoolean(items[6]);
