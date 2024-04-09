@@ -9,6 +9,7 @@ import com.engeto.restaurant.util.Settings;
 import java.io.*;
 import java.math.BigDecimal;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class RestaurantManager {
@@ -171,10 +172,18 @@ public class RestaurantManager {
         BigDecimal totalCost = BigDecimal.ZERO;
 
         for (Order order : ordersList) {
-            if (order.getTable().getTableNumber() == tableNumber) {
+            if (Table.getTableNumber() == tableNumber) {
                 totalCost = totalCost.add(order.getOrderedDish().getPrice().multiply(BigDecimal.valueOf(order.getQuantity())));
             }
         }
         return totalCost;
+    }
+
+    private static void createOrder(Dish dish, int quantity, int tableNumber, LocalDateTime orderedTime, LocalDateTime fulfilmentTime,
+                                    boolean isPaid) throws RestaurantException {
+        Order order = new Order(Optional.ofNullable(dish), quantity, tableNumber);
+        order.setOrderedTime(orderedTime);
+        order.setServedTime(fulfilmentTime);
+        order.setPaid(isPaid);
     }
 }
