@@ -2,6 +2,7 @@ package com.engeto.restaurant.model;
 
 import com.engeto.restaurant.manager.RestaurantManager;
 import com.engeto.restaurant.util.RestaurantException;
+import com.engeto.restaurant.util.ValidationUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -76,17 +77,11 @@ public class Order {
         return orderTime;
     }
 
-    public void setOrderTime(LocalDateTime orderTime) {
-        this.orderTime = orderTime;
-    }
 
     public LocalDateTime getServedTime() {
         return servedTime;
     }
 
-    public void setServedTime(LocalDateTime servedTime) {
-        this.servedTime = servedTime;
-    }
 
     public Dish getDish() {
         return dish;
@@ -125,6 +120,21 @@ public class Order {
 
     public void setPaid(boolean paid) {
         isPaid = paid;
+    }
+
+    public void setOrderedTime(LocalDateTime orderedTime) throws RestaurantException {
+        ValidationUtils.validateTime(orderedTime, "Ordered time");
+        this.orderTime = orderedTime;
+    }
+
+    public void setServedTime(LocalDateTime servedTime) throws RestaurantException {
+        if (servedTime != null) {
+            ValidationUtils.validateTime(servedTime, "Served time");
+            if (servedTime.isBefore(orderTime)) {
+                throw new RestaurantException("Served time cannot be before order time!");
+            }
+        }
+        this.servedTime = servedTime;
     }
 
     public String exportOrderToString() {
