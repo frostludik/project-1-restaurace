@@ -11,7 +11,6 @@ public class DishList {
     List<Dish> dishes = new ArrayList<>();
 
     public DishList() {
-        this.dishes = dishes;
     }
 
     public List<Dish> getDishes() {
