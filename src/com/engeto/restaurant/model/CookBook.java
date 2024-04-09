@@ -8,24 +8,28 @@ import java.util.Optional;
 
 public class CookBook {
 
-    private Map<Long, Dish> dishes = new HashMap<>();
+    private static Map<String, Dish> dishMap = new HashMap<>();
 
-    public void addDish(Dish dish) {
-        dishes.put(dish.getId(), dish);
+    public static void addDish(Dish dish) {
+        dishMap.put(dish.getTitle(), dish);
+    }
+
+    public static void addDishToCookBook(Dish dish) {
+        dishMap.put(dish.getTitle(), dish);
     }
 
     public void removeDishById(long id) throws RestaurantException {
-        if (!dishes.containsKey(id)) {
+        if (!dishMap.containsKey(id)) {
             throw new RestaurantException("Dish with ID " + id + " not found.");
         }
-        dishes.remove(id);
+        dishMap.remove(id);
     }
-    public Optional<Dish> getDishById(long id) {
-        return Optional.ofNullable(dishes.get(id));
+    public static Optional<Dish> getDishById(long id) {
+        return Optional.ofNullable(dishMap.get(id));
     }
 
 
     public Collection<Dish> getAllDishes() {
-        return dishes.values();
+        return dishMap.values();
     }
 }
