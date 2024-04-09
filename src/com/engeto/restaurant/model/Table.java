@@ -8,7 +8,7 @@ public class Table {
     private static int tableNumber;
 
     public Table(int tableNumber) {
-        Table.tableNumber = tableNumber;
+        this.tableNumber = tableNumber;
         RestaurantManager.addTable(this);
     }
 
@@ -18,7 +18,7 @@ public class Table {
 
     public static Table getTableByNumber(int tableNumber, List<Table> tables) throws RestaurantException {
         for (Table table : tables) {
-            if (getTableNumber() == tableNumber) {
+            if (table.getTableNumber() == tableNumber) {
                 return table;
             }
         }
