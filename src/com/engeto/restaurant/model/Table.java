@@ -1,7 +1,7 @@
 package com.engeto.restaurant.model;
 
+import com.engeto.restaurant.manager.RestaurantManager;
 import com.engeto.restaurant.util.RestaurantException;
-
 import java.util.List;
 
 public class Table {
@@ -9,6 +9,7 @@ public class Table {
 
     public Table(int tableNumber) {
         this.tableNumber = tableNumber;
+        RestaurantManager.addTable(this);
     }
 
     public int getTableNumber() {
