@@ -72,6 +72,9 @@ public class Main {
         Order secondOrder = new Order(hranolky, 2, 15);
         Order thirdOrder = new Order(kofola, 2, 15);
         thirdOrder.serveOrder();
+
+        Order fourthOrder = new Order(pstruh, 1, 2);
+        Order fifthOrder = new Order(kofola, 1, 2);
     }
 
 
