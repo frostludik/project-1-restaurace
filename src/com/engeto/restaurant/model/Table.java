@@ -25,4 +25,8 @@ public class Table {
         throw new RestaurantException("Table with number: " + tableNumber + " not found!");
     }
 
+    @Override
+    public String toString() {
+        return "Table{}";
+    }
 }
