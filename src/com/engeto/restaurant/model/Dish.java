@@ -66,9 +66,7 @@ public class Dish {
         this.price = price;
     }
 
-    public int getPreparationTime() {
-        return preparationTime;
-    }
+    public int getPreparationTime() { return preparationTime; }
 
     public void setPreparationTime(int preparationTime) throws RestaurantException {
         ValidationUtils.validatePreparationTime(preparationTime);
@@ -82,19 +80,29 @@ public class Dish {
     public void setDishImage(String dishImage) {
         this.dishImage = ValidationUtils.validateDishImage(dishImage, Dish.defaultImage);
     }
-    public static Dish parseDish(String data) throws RestaurantException {
-        String [] items;
+
+    public static Dish parseDish(String line) throws NumberFormatException, RestaurantException {
+        if (line == null || line.trim().isEmpty()) {
+            throw new RestaurantException("Empty line in the file.");
+        }
+        String[] parts = line.split(";");
+        ValidationUtils.validateNumberOfFields(parts, 5);
         try {
-            items = data.split("\t");
-            String title = items[0];
-            BigDecimal price = new BigDecimal(items[1]);
-            int preparationTime = Integer.parseInt(items[2]);
-            String imageMain = items[3];
-            return new Dish(title, price, preparationTime, defaultImage );
-        } catch (IllegalArgumentException e) {
-            throw new RestaurantException("Wrong data. Unable to parse dish from file!");
+            long id = Long.parseLong(parts[0]);
+            String title = parts[1];
+            BigDecimal price = new BigDecimal(parts[2]);
+            int preparationTime = Integer.parseInt (parts[3]);
+            String image = parts[4];
+
+            Dish dish = Dish.createDishWithId(id, title, price, preparationTime, image);
+            CookBook.addDishToCookBook(dish);
+            return dish;
+        } catch (NumberFormatException e) {
+            throw new RestaurantException("Error parsing dish: " + e.getMessage());
         }
     }
+
+
     public String exportToString() {
         return title + "\t" + price + "\t" + preparationTime + "\t" + defaultImage;
     }
