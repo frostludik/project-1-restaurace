@@ -23,4 +23,13 @@ public class ValidationUtils {
             throw new RestaurantException(fieldName + " cannot be in future. Value set: " + time);
         }
     }
+
+    public static void validateNumberOfFields(String[] parts, int expectedNrOfFields) throws RestaurantException {
+        int numberOfFields = parts.length;
+        if (numberOfFields != expectedNrOfFields) {
+            throw new RestaurantException(
+                    String.format("Incorrect nr of fields in the line! Expected: %d, found: %d.", expectedNrOfFields, numberOfFields)
+            );
+        }
+    }
 }
