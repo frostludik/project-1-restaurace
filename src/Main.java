@@ -8,6 +8,7 @@ import com.engeto.restaurant.util.Settings;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public class Main {
@@ -24,17 +25,27 @@ public class Main {
 
 
         //3. Vypiš celkovou cenu konzumace pro stůl číslo 15.
-        System.out.println("\nCelková cena konzumace pro daný stůl je: " + RestaurantManager.getTotalCostPerTable(15) + " Kč.");
+        System.out.println("\n** Celková cena konzumace pro daný stůl je: " + RestaurantManager.getTotalCostPerTable(15) + " Kč.");
 
         //4. Použij všechny připravené metody pro získání informací pro management — údaje vypisuj na obrazovku.
-        System.out.println("\nPočet rozpracovaných a nedokončených objednávek: " + RestaurantManager.getOrdersInProgress());
-        System.out.println("\nObjednávky seřazené podle času: \n" + RestaurantManager.sortOrdersByOrderTime());
-        System.out.println("\nPrůměrná doba zpracování objednávek: " + RestaurantManager.getAverageTimeToServe());
-        System.out.println("\nSeznam jídel, která byla dnes objednána: \n" + RestaurantManager.getUniqueMealsOrderedToday());
-        System.out.println("\nExport seznamu objednávek pro jeden stůl: \n" + RestaurantManager.getOrdersForTableOutput(15));
+        System.out.println("\n** Počet rozpracovaných a nedokončených objednávek: " + RestaurantManager.getOrdersInProgress());
+        System.out.println("\n** Objednávky seřazené podle času:");
+        List<Order> sortedOrders = RestaurantManager.sortOrdersByOrderTime();
+        for (Order order : sortedOrders) {
+            System.out.println(order);
+        }
+        System.out.println("\n** Průměrná doba zpracování objednávek: " + RestaurantManager.getAverageTimeToServe());
+        System.out.println("\n** Seznam jídel, která byla dnes objednána:");
+        List<String> uniqueMealsOrderedToday = RestaurantManager.getUniqueMealsOrderedToday();
+        for (String meal : uniqueMealsOrderedToday) {
+            System.out.println(meal);
+        }
+
+        System.out.println(RestaurantManager.getOrdersForTableOutput(15));
 
         //5. Změněná data ulož na disk.
         RestaurantManager.exportDataToFile();
+        System.out.println("\n** Data byla exportována do souboru.");
 
 
     }
@@ -52,14 +63,16 @@ public class Main {
     }
 
     private static void createOrders() throws RestaurantException {
-        Dish rizek = CookBook.getDishById(1);
-        Dish hranolky = CookBook.getDishById(2);
-        Dish pstruh = CookBook.getDishById(3);
-        Dish kofola = CookBook.getDishById(4);
+        Dish rizek = CookBook.getDishFromCookBookById(1);
+        Dish hranolky = CookBook.getDishFromCookBookById(2);
+        Dish pstruh = CookBook.getDishFromCookBookById(3);
+        Dish kofola = CookBook.getDishFromCookBookById(4);
 
         Order firstOrder = new Order(rizek, 2, 15);
         Order secondOrder = new Order(hranolky, 2, 15);
         Order thirdOrder = new Order(kofola, 2, 15);
-        thirdOrder.fulfilOrder();
+        thirdOrder.serveOrder();
     }
+
+
 }
