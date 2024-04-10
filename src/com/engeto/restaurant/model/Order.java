@@ -5,8 +5,6 @@ import com.engeto.restaurant.util.RestaurantException;
 import com.engeto.restaurant.util.ValidationUtils;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Optional;
 
 
 public class Order {
@@ -65,13 +63,10 @@ public class Order {
         return orderTime;
     }
 
-
-//    public LocalDateTime getServedTime() {
-//        return this.servedTime;
-//    }
-    public Optional<LocalDateTime> getServedTime() {
-        return Optional.ofNullable(this.servedTime);
+    public LocalDateTime getServedTime() {
+        return servedTime;
     }
+
     public Dish getDish() {
         return dish;
     }
@@ -135,18 +130,16 @@ public class Order {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
         return orderTime.format(formatter);
     }
-//    public String getServedTimeFormatted() {
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-//        return getServedTime().format(formatter);
-//    }
+
     public String getServedTimeFormatted() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-        return getServedTime()
-                .map(servedTime -> servedTime.format(formatter))
-                .orElse("Not served");
-}
-
-
+        LocalDateTime servedTime = getServedTime();
+        if (servedTime == null) {
+            return "";
+        } else {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+            return servedTime.format(formatter);
+        }
+    }
 
     public String getOrderFormattedForPrint() {
 
@@ -155,24 +148,53 @@ public class Order {
                 + getOrderTimeFormatted() + "-" + getServedTimeFormatted() + "\t" + paidText;
     }
 
-    public Order parseOrder(String data) throws RestaurantException {String [] items;
+
+    public static Dish getDishById(long dishId) throws RestaurantException {
         try {
-            items = data.split("\t");
-            int table = Integer.parseInt(items[0]);
-            LocalDateTime orderTime = LocalDateTime.parse(items[1]);
-            LocalDateTime servedTime = LocalDateTime.parse(items[2]);
-            Dish dish = Dish.parseDish(items[3]);
-            int quantity = Integer.parseInt(items[4]);
-            boolean isServed = Boolean.parseBoolean(items[5]);
-            boolean isPaid = Boolean.parseBoolean(items[6]);
-            return new Order(table, orderTime, servedTime, dish, quantity, isServed, isPaid);
-        }
-        catch (IllegalArgumentException e) {
-            throw new RestaurantException("Unable to read data from file!");
+            return CookBook.getDishFromCookBookById(dishId);
+        } catch (RestaurantException e) {
+            throw new RestaurantException(e.getMessage());
         }
     }
+    public static void parseOrderLine(String line) throws RestaurantException {
+        String[] parts = line.split(";");
+        ValidationUtils.validateNumberOfFields(parts, 7);
 
-    public void fulfilOrder() {
+        long id = Long.parseLong(parts[0]);
+        int tableNumber = Integer.parseInt(parts[1]);
+        long dishId = Long.parseLong(parts[2]);
+        int quantity = Integer.parseInt(parts[3]);
+        LocalDateTime orderTime = LocalDateTime.parse(parts[4]);
+        LocalDateTime servedTime = parts[5].trim().equals("null") ? null : LocalDateTime.parse(parts[5]);
+        boolean isPaid = Boolean.parseBoolean(parts[6]);
+
+        Dish dish = getDishById(dishId);
+        createOrder(dish, quantity, tableNumber, orderTime, servedTime, isPaid);
+    }
+
+    public static void createOrder(Dish dish, int quantity, int tableNumber, LocalDateTime orderedTime, LocalDateTime servedTime,
+                                    boolean isPaid) throws RestaurantException {
+        Order order = new Order(dish, quantity, tableNumber);
+        order.setOrderedTime(orderedTime);
+        order.setServedTime(servedTime);
+        order.setPaid(isPaid);
+    }
+    public void serveOrder() {
         servedTime = LocalDateTime.now();
+    }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "id=" + id +
+                ", dish=" + dish +
+                ", quantity=" + quantity +
+                ", table=" + table +
+                ", orderTime=" + orderTime +
+                ", servedTime=" + servedTime +
+                ", isServed=" + isServed +
+                ", isPaid=" + isPaid +
+                '}';
+
     }
 }
