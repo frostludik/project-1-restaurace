@@ -1,0 +1,4 @@
+1;Kuřecí řízek obalovaný 150 g;185;25;blank
+2;Hranolky 150 g;70;10;blank
+3;Pstruh na víně 200 g;220;40;blank
+4;Kofola 0,5 l;45;5;blank
