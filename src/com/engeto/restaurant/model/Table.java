@@ -5,15 +5,15 @@ import com.engeto.restaurant.util.RestaurantException;
 import java.util.List;
 
 public class Table {
-    private static int tableNumber;
+    private int tableNumber;
 
     public Table(int tableNumber) {
         this.tableNumber = tableNumber;
         RestaurantManager.addTable(this);
     }
 
-    public static int getTableNumber() {
-        return tableNumber;
+    public int getTableNumber() {
+        return this.tableNumber;
     }
 
     public static Table getTableByNumber(int tableNumber, List<Table> tables) throws RestaurantException {
