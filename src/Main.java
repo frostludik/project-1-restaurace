@@ -41,7 +41,8 @@ public class Main {
             System.out.println(meal);
         }
 
-        System.out.println(RestaurantManager.getOrdersForTableOutput(15));
+        System.out.println("\n** Export seznamu objednávek pro jeden stůl:");
+        RestaurantManager.getOrdersForTableOutput(15);
 
         //5. Změněná data ulož na disk.
         RestaurantManager.exportDataToFile();
