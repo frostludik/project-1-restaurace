@@ -103,8 +103,10 @@ public class RestaurantManager {
         System.out.println("****");
 
         for (Order order : ordersList) {
-            if (Table.getTableNumber() == tableNumber) {
-                System.out.println(orderNumber + order.getOrderFormattedForPrint());
+            // Assuming Order has a method getTableNumber() to get the table number it's associated with
+            if (order.getTable().getTableNumber() == tableNumber) {
+                System.out.println(orderNumber + ". " + order.getOrderFormattedForPrint()); // Added ". " for formatting
+                ordersForTable.add(order); // Assuming you want to collect orders for the specific table
                 orderNumber += 1;
             }
         }
@@ -117,7 +119,7 @@ public class RestaurantManager {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(orderFileName, false))) {
             for (Order order : ordersList) {
                 Table orderTable = order.getTable();
-                int tableNumber = Table.getTableNumber();
+                int tableNumber = order.getTable().getTableNumber();
                 String line = String.format("%s;%s;%s;%s;%s;%s;%s",
                         order.getId(), tableNumber, order.getOrderedDish().getId(),
                         order.getQuantity(), order.getOrderTime(), order.getServedTime(), order.isPaid());
@@ -203,7 +205,7 @@ public class RestaurantManager {
         BigDecimal totalCost = BigDecimal.ZERO;
 
         for (Order order : ordersList) {
-            if (Table.getTableNumber() == tableNumber) {
+            if (order.getTable().getTableNumber() == tableNumber) {
                 totalCost = totalCost.add(order.getOrderedDish().getPrice().multiply(BigDecimal.valueOf(order.getQuantity())));
             }
         }
