@@ -96,22 +96,19 @@ public class RestaurantManager {
         return header;
     }
 
-    public static List<Order> getOrdersForTableOutput(int tableNumber) {
+    public static void getOrdersForTableOutput(int tableNumber) {
         int orderNumber = 1;
         List<Order> ordersForTable = new ArrayList<>();
         System.out.println(getOrderHeaderForTableOutput(tableNumber));
         System.out.println("****");
 
         for (Order order : ordersList) {
-            // Assuming Order has a method getTableNumber() to get the table number it's associated with
             if (order.getTable().getTableNumber() == tableNumber) {
-                System.out.println(orderNumber + ". " + order.getOrderFormattedForPrint()); // Added ". " for formatting
-                ordersForTable.add(order); // Assuming you want to collect orders for the specific table
+                System.out.println(orderNumber + ". " + order.getOrderFormattedForPrint());
                 orderNumber += 1;
             }
         }
         System.out.println("******");
-        return ordersForTable;
     }
 
     public static void exportOrdersToFile() {
