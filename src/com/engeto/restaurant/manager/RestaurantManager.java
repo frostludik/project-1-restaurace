@@ -1,5 +1,6 @@
 package com.engeto.restaurant.manager;
 
+import com.engeto.restaurant.model.CookBook;
 import com.engeto.restaurant.model.Dish;
 import com.engeto.restaurant.model.Order;
 import com.engeto.restaurant.model.Table;
@@ -56,33 +57,16 @@ public class RestaurantManager {
     }
 
 
-//    public static double getAverageTimeToServe() {
-//        long totalSeconds = 0;
-//        int ordersServed = 0;
-//
-//        for (Order order : ordersList) {
-//            if (order.isServed() && order.getServedTime() != null && order.getOrderTime() != null) {
-//                Duration duration = Duration.between(order.getOrderTime(), order.getServedTime());
-//                totalSeconds += duration.getSeconds();
-//                ordersServed++;
-//            }
-//        }
-//        if (ordersServed == 0) {
-//            return 0;
-//        }
-//        return (double) totalSeconds / ordersServed;
-//    }
-
     public static double getAverageTimeToServe() {
-        long totalSeconds = 0;
+        long totalMinutes = 0;
         int ordersServed = 0;
 
         for (Order order : ordersList) {
             if (order.isServed() && order.getOrderTime() != null) {
-                Optional<LocalDateTime> servedTimeOpt = order.getServedTime();
-                if (servedTimeOpt.isPresent()) {
-                    Duration duration = Duration.between(order.getOrderTime(), servedTimeOpt.get());
-                    totalSeconds += duration.getSeconds();
+                LocalDateTime servedTime = order.getServedTime();
+                if (servedTime != null) {
+                    Duration duration = Duration.between(order.getOrderTime(), servedTime);
+                    totalMinutes += duration.toMinutes();
                     ordersServed++;
                 }
             }
@@ -90,9 +74,8 @@ public class RestaurantManager {
         if (ordersServed == 0) {
             return 0;
         }
-        return (double) totalSeconds / ordersServed;
+        return (double) totalMinutes / ordersServed;
     }
-
 
 
     public static List<String> getUniqueMealsOrderedToday() {
@@ -106,13 +89,12 @@ public class RestaurantManager {
     }
 
     private static String getOrderHeaderForTableOutput(int tableNumber) {
-        String header = "** Objednávky pro stůl č. " + tableNumber;
+        String header = "\n** Objednávky pro stůl č. " + tableNumber;
         if (tableNumber < 9) {
-            header = "** Objednávky pro stůl č. " + " " + tableNumber;
+            header = "\n** Objednávky pro stůl č. " + " " + tableNumber;
         }
         return header;
     }
-
 
     public static List<Order> getOrdersForTableOutput(int tableNumber) {
         int orderNumber = 1;
@@ -129,55 +111,80 @@ public class RestaurantManager {
         System.out.println("******");
         return ordersForTable;
     }
-    private static void exportOrdersToFile() throws RestaurantException {
+
+    public static void exportOrdersToFile() {
         String orderFileName = Settings.getOrdersFile();
-        try (PrintWriter outputWriter = new PrintWriter(new BufferedWriter(new FileWriter(orderFileName)))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(orderFileName, false))) {
             for (Order order : ordersList) {
-                outputWriter.println(order.exportOrderToString());
+                Table orderTable = order.getTable();
+                int tableNumber = Table.getTableNumber();
+                String line = String.format("%s;%s;%s;%s;%s;%s;%s",
+                        order.getId(), tableNumber, order.getOrderedDish().getId(),
+                        order.getQuantity(), order.getOrderTime(), order.getServedTime(), order.isPaid());
+                writer.write(line);
+                writer.newLine();
             }
         } catch (IOException e) {
-            throw new RestaurantException("Saving data to a file: " + orderFileName + " failed!");
+            System.err.println("Error exporting orders to file: " + e.getMessage());
         }
     }
 
-    private static void exportDishesToFile() throws RestaurantException {
+
+    public static void exportDishesToFile() {
         String dishesFileName = Settings.getCookbookFile();
-        try (PrintWriter outputWriter = new PrintWriter(new BufferedWriter(new FileWriter(dishesFileName)))) {
-            for (Dish dish : dishes) {
-                outputWriter.println(dish.exportToString());
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(dishesFileName))) {
+            for (Map.Entry<Long, Dish> entry : CookBook.getAllDishes().entrySet()) {
+                Dish dish = entry.getValue();
+                String line = String.format("%s;%s;%s;%s;%s",
+                        dish.getId(), dish.getTitle(), dish.getPrice(),
+                        dish.getPreparationTime(), dish.getDishImage());
+                writer.write(line);
+                writer.newLine();
             }
         } catch (IOException e) {
-            throw new RestaurantException("Saving data to file: " + dishesFileName + " failed!");
+            System.err.println("Error exporting dishes to file: " + e.getMessage());
         }
     }
+
+
+
     private static void importOrdersFromFile() throws RestaurantException {
         String orderFileName = Settings.getOrdersFile();
+        int lineNumber = 1;
+        String line = null;
         try (Scanner scanner = new Scanner(new BufferedReader(new FileReader(orderFileName)))) {
             while (scanner.hasNextLine()) {
-                String line = scanner.nextLine();
-                ordersList.add(order.parseOrder(line));}
+                line = scanner.nextLine();
+                Order.parseOrderLine(line);
+                lineNumber++;
+            }
         } catch (FileNotFoundException e) {
-            throw new RestaurantException("File " + orderFileName + " not found!");
+            throw new RestaurantException("File " + orderFileName + " not found!" + e.getLocalizedMessage());
+        } catch (Exception e) {
+            throw new RestaurantException("An error occurred while processing file " + orderFileName + ": " + e.getMessage());
         }
     }
 
-    public static List<Dish> importDishesFromFile() throws RestaurantException {
+
+    public static void importDishesFromFile() throws RestaurantException {
         String dishesFileName = Settings.getCookbookFile();
         try (Scanner scanner = new Scanner(new BufferedReader(new FileReader(dishesFileName)))) {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
-                dishes.add(Dish.parseDish(line)); }
+                dishes.add(Dish.parseDish(line));
+            }
         } catch (FileNotFoundException e) {
             throw new RestaurantException("File" + dishesFileName + " not found!");
+        } catch (Exception e) {
+            throw new RestaurantException("An error occurred while processing file " + dishesFileName + ": " + e.getMessage());
         }
-        return null;
     }
 
     public static void importDataFromFile() throws RestaurantException {
         try {
-            importOrdersFromFile();
             importDishesFromFile();
-        } catch (Exception e) {
+            importOrdersFromFile();
+        } catch (RestaurantException e) {
             System.err.println("Error reading from the file: " + e.getMessage());
         }
     }
@@ -185,8 +192,8 @@ public class RestaurantManager {
 
     public static void exportDataToFile() {
         try {
-            exportOrdersToFile();
             exportDishesToFile();
+            exportOrdersToFile();
         } catch (Exception e) {
             System.err.println("Error saving data to file file: " + e.getMessage());
         }
@@ -203,11 +210,4 @@ public class RestaurantManager {
         return totalCost;
     }
 
-    private static void createOrder(Dish dish, int quantity, int tableNumber, LocalDateTime orderedTime, LocalDateTime fulfilmentTime,
-                                    boolean isPaid) throws RestaurantException {
-        Order order = new Order(dish, quantity, tableNumber);
-        order.setOrderedTime(orderedTime);
-        order.setServedTime(fulfilmentTime);
-        order.setPaid(isPaid);
-    }
 }
