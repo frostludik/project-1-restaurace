@@ -101,11 +101,6 @@ public class Dish {
         }
     }
 
-
-//    public String exportToString() {
-//        return title + "\t" + price + "\t" + preparationTime + "\t" + defaultImage;
-//    }
-
     @Override
     public String toString() {
         return title;
