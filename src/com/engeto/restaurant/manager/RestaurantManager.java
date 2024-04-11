@@ -10,7 +10,6 @@ import com.engeto.restaurant.util.Settings;
 import java.io.*;
 import java.math.BigDecimal;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.*;
 
 public class RestaurantManager {
@@ -57,24 +56,22 @@ public class RestaurantManager {
     }
 
 
-    public static double getAverageTimeToServe() {
-        long totalMinutes = 0;
-        int ordersServed = 0;
+    public static String getAverageTimeToServe() {
+        List<Order> servedOrders = ordersList.stream()
+                .filter(order -> order.getServedTime() != null)
+                .toList();
 
-        for (Order order : ordersList) {
-            if (order.isServed() && order.getOrderTime() != null) {
-                LocalDateTime servedTime = order.getServedTime();
-                if (servedTime != null) {
-                    Duration duration = Duration.between(order.getOrderTime(), servedTime);
-                    totalMinutes += duration.toMinutes();
-                    ordersServed++;
-                }
-            }
+        if (servedOrders.isEmpty()) {
+            return "Nejsou dostupné žádná data pro výpočet průměrné doby zpracování objednávek.";
         }
-        if (ordersServed == 0) {
-            return 0;
+
+        Duration totalTimeToServe = Duration.ZERO;
+        for (Order order : servedOrders) {
+            totalTimeToServe = totalTimeToServe.plus(Duration.between(order.getOrderTime(), order.getServedTime()));
         }
-        return (double) totalMinutes / ordersServed;
+        long averageMinutes = totalTimeToServe.dividedBy(servedOrders.size()).toMinutes();
+
+        return String.format("%d minut", averageMinutes);
     }
 
 
