@@ -46,7 +46,6 @@ public class Order {
         return id;
     }
 
-
     public void setId(long id) {
         this.id = id;
     }
@@ -93,9 +92,7 @@ public class Order {
         return isServed;
     }
 
-    public void setServed(boolean served) {
-        isServed = served;
-    }
+    public void setServed() { servedTime = LocalDateTime.now();}
 
     public boolean isPaid() {
         return isPaid;
@@ -104,6 +101,8 @@ public class Order {
     public void setPaid(boolean paid) {
         isPaid = paid;
     }
+
+
 
     public void setOrderedTime(LocalDateTime orderedTime) throws RestaurantException {
         ValidationUtils.validateTime(orderedTime, "Ordered time");
@@ -179,22 +178,17 @@ public class Order {
         order.setServedTime(servedTime);
         order.setPaid(isPaid);
     }
-    public void serveOrder() {
-        servedTime = LocalDateTime.now();
-    }
 
     @Override
     public String toString() {
-        return "Order{" +
-                "id=" + id +
-                ", dish=" + dish +
-                ", quantity=" + quantity +
-                ", table=" + table +
-                ", orderTime=" + orderTime +
-                ", servedTime=" + servedTime +
-                ", isServed=" + isServed +
-                ", isPaid=" + isPaid +
-                '}';
-
+        return String.format("Order{id: %3d, dish: %-30s, quantity: %2d, table: %-2s, orderTime: %-30s, servedTime: %-30s, isServed: %-5b, isPaid: %-5b}",
+                id,
+                dish,
+                quantity,
+                table.getTableNumber(),
+                orderTime,
+                (servedTime != null ? servedTime : ""),
+                isServed,
+                isPaid);
     }
 }
