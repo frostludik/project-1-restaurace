@@ -64,13 +64,11 @@ public class RestaurantManager {
         if (servedOrders.isEmpty()) {
             return "Nejsou dostupné žádná data pro výpočet průměrné doby zpracování objednávek.";
         }
-
         Duration totalTimeToServe = Duration.ZERO;
         for (Order order : servedOrders) {
             totalTimeToServe = totalTimeToServe.plus(Duration.between(order.getOrderTime(), order.getServedTime()));
         }
         long averageMinutes = totalTimeToServe.dividedBy(servedOrders.size()).toMinutes();
-
         return String.format("%d minut", averageMinutes);
     }
 
@@ -141,7 +139,6 @@ public class RestaurantManager {
             System.err.println("Error exporting dishes to file: " + e.getMessage());
         }
     }
-
 
 
     private static void importOrdersFromFile() throws RestaurantException {
