@@ -11,10 +11,15 @@ public class ValidationUtils {
         }
     }
 
-    public static String validateDishImage(String dishImage, String defaultImage) {
+//    public static String validateDishImage(String dishImage, String defaultImage) {
+//        return (dishImage == null || dishImage.isEmpty()) ? defaultImage : dishImage;
+//    }
+    public static String validateDishImage(String dishImage, String defaultImage) throws RestaurantException {
+        if ((dishImage == null || dishImage.isEmpty()) && (defaultImage == null || defaultImage.isEmpty())) {
+            throw new RestaurantException("Image cannot be empty! Replaced by default image.");
+        }
         return (dishImage == null || dishImage.isEmpty()) ? defaultImage : dishImage;
     }
-
 
     public static void validateTime(LocalDateTime time, String fieldName) throws RestaurantException {
         LocalDateTime currentDateTime = LocalDateTime.now();
@@ -28,7 +33,7 @@ public class ValidationUtils {
         int numberOfFields = parts.length;
         if (numberOfFields != expectedNrOfFields) {
             throw new RestaurantException(
-                    String.format("Incorrect nr of fields in the line! Expected: %d, found: %d.", expectedNrOfFields, numberOfFields)
+                    String.format("Incorrect number of fields in the line! Expected: %d, found: %d.", expectedNrOfFields, numberOfFields)
             );
         }
     }
