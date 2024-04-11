@@ -34,19 +34,18 @@ public class Main {
         for (Order order : sortedOrders) {
             System.out.println(order);
         }
-        System.out.println("\n** Průměrná doba zpracování objednávek: " + RestaurantManager.getAverageTimeToServe());
+        System.out.println("\n** Průměrná doba zpracování objednávek je: " + RestaurantManager.getAverageTimeToServe());
         System.out.println("\n** Seznam jídel, která byla dnes objednána:");
         List<String> uniqueMealsOrderedToday = RestaurantManager.getUniqueMealsOrderedToday();
         for (String meal : uniqueMealsOrderedToday) {
             System.out.println(meal);
         }
-
         System.out.println("\n** Export seznamu objednávek pro jeden stůl:");
         RestaurantManager.getOrdersForTableOutput(15);
 
         //5. Změněná data ulož na disk.
         RestaurantManager.exportDataToFile();
-        System.out.println("\n** Data byla exportována do souboru.");
+        System.out.println("\n** Data byla exportována do souborů: " + Settings.getCookbookFile() + " a " + Settings.getOrdersFile());
 
 
     }
@@ -78,5 +77,6 @@ public class Main {
         Order fourthOrder = new Order(pstruh, 1, 2);
         Order fifthOrder = new Order(kofola, 1, 2);
         //fifthOrder.setServed();
+        //fifthOrder.setPaid(true);
     }
 }
