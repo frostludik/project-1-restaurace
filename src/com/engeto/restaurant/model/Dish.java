@@ -26,7 +26,6 @@ public class Dish {
         CookBook.addDishToCookBook(this);
     }
 
-
     public Dish(String title, BigDecimal price, int preparationTime) throws RestaurantException {
         this(title, price, preparationTime, defaultImage);
     }
@@ -77,7 +76,7 @@ public class Dish {
         return dishImage;
     }
 
-    public void setDishImage(String dishImage) {
+    public void setDishImage(String dishImage) throws RestaurantException {
         this.dishImage = ValidationUtils.validateDishImage(dishImage, Dish.defaultImage);
     }
 
