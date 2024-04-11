@@ -11,9 +11,6 @@ public class ValidationUtils {
         }
     }
 
-//    public static String validateDishImage(String dishImage, String defaultImage) {
-//        return (dishImage == null || dishImage.isEmpty()) ? defaultImage : dishImage;
-//    }
     public static String validateDishImage(String dishImage, String defaultImage) throws RestaurantException {
         if ((dishImage == null || dishImage.isEmpty()) && (defaultImage == null || defaultImage.isEmpty())) {
             throw new RestaurantException("Image cannot be empty! Replaced by default image.");
