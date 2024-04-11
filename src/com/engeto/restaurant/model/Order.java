@@ -93,9 +93,6 @@ public class Order {
         this.isServed = true;
     }
 
-    public void setServedOwnTime(LocalDateTime servedTime) {     //odebrat, jen pro testování
-        this.servedTime = servedTime; }
-
     public boolean isPaid() {
         return isPaid;
     }
@@ -103,8 +100,6 @@ public class Order {
     public void setPaid(boolean paid) {
         isPaid = paid;
     }
-
-
 
     public void setOrderedTime(LocalDateTime orderedTime) throws RestaurantException {
         ValidationUtils.validateTime(orderedTime, "Ordered time");
@@ -120,11 +115,6 @@ public class Order {
         }
         this.servedTime = servedTime;
         this.isServed = true;
-    }
-
-
-    public String exportOrderToString() {
-        return table + "\t" + orderTime + "\t" + servedTime + "\t" + dish + "\t" + quantity + "\t" + isServed + "\t" + isPaid;
     }
 
     public String getOrderTimeFormatted() {
