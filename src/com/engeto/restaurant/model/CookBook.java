@@ -31,7 +31,7 @@ public class CookBook {
     }
 
     public static Map<Long, Dish> getAllDishes() {
-        return new LinkedHashMap<>(dishMap); // Return a copy to prevent modification
+        return new LinkedHashMap<>(dishMap);
     }
 }
 
