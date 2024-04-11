@@ -16,7 +16,7 @@ public class Order {
     private Table table;
     private LocalDateTime orderTime;
     private LocalDateTime servedTime;
-    private boolean isServed;
+    private boolean isServed = false;
     private boolean isPaid;
 
     public Order() {
@@ -38,9 +38,6 @@ public class Order {
         this(dish, quantity, tableNumber, LocalDateTime.now(), null,false);
     }
 
-    public Order(int tableNumber, LocalDateTime orderTime, LocalDateTime servedTime, Dish dish, int quantity, boolean isServed, boolean isPaid) throws RestaurantException {
-        this(dish, quantity, tableNumber, LocalDateTime.now(), null, false);
-    }
 
     public long getId() {
         return id;
@@ -87,12 +84,17 @@ public class Order {
         }
         this.quantity = quantity;
     }
-
     public boolean isServed() {
-        return isServed;
+        return this.isServed;
     }
 
-    public void setServed() { servedTime = LocalDateTime.now();}
+    public void setServed() {
+        this.servedTime = LocalDateTime.now();
+        this.isServed = true;
+    }
+
+    public void setServedOwnTime(LocalDateTime servedTime) {     //odebrat, jen pro testování
+        this.servedTime = servedTime; }
 
     public boolean isPaid() {
         return isPaid;
@@ -181,7 +183,7 @@ public class Order {
 
     @Override
     public String toString() {
-        return String.format("Order{id: %3d, dish: %-30s, quantity: %2d, table: %-2s, orderTime: %-30s, servedTime: %-30s, isServed: %-5b, isPaid: %-5b}",
+        return String.format("Objednávka { id: %3d, jídlo: %-30s, ks: %2d, stůl: %-2s, čas objednání: %-30s, čas vyřízení: %-30s, isServed: %-5b, isPaid: %-5b}",
                 id,
                 dish,
                 quantity,
