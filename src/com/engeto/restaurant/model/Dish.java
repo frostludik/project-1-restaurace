@@ -31,7 +31,7 @@ public class Dish {
         this(title, price, preparationTime, defaultImage);
     }
 
-    private Dish(long id, String title, BigDecimal price, int preparationTimeInMinutes, String dishImage) throws RestaurantException {
+    public Dish(long id, String title, BigDecimal price, int preparationTimeInMinutes, String dishImage) throws RestaurantException {
         this.id = id;
         this.title = title;
         setPrice(price);
@@ -103,9 +103,9 @@ public class Dish {
     }
 
 
-    public String exportToString() {
-        return title + "\t" + price + "\t" + preparationTime + "\t" + defaultImage;
-    }
+//    public String exportToString() {
+//        return title + "\t" + price + "\t" + preparationTime + "\t" + defaultImage;
+//    }
 
     @Override
     public String toString() {
